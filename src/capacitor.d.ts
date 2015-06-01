@@ -2,7 +2,7 @@
 declare module 'capacitor' {
 	import immutable = require('immutable');
 	type scalar = number|string;
-	module Implementation {
+	module Interface {
 		interface Action {
 			toString: () => string;
 		}
@@ -36,12 +36,6 @@ declare module 'capacitor' {
 			create(name: string): Action;
 			list(): string[];
 			exists(name: string): boolean;
-		}
-		
-		interface ActionCreator {
-			dispatch(action: Action, payload: any) : ActionInstance;
-			createActionInstance(action: Action, payload : any) : ActionInstance;
-			generateRequestID() : number;
 		}
 		
 		interface StoreInterface {
@@ -78,35 +72,35 @@ declare module 'capacitor' {
 	 */
 	export function invariant(invariant: boolean, errorMessage?: string): void;
 	
-	export var actionManager: Implementation.ActionManager;
+	export var actionManager: Interface.ActionManager;
 	
-	export class Store implements Implementation.Store {
+	export class Store implements Interface.Store {
 		/**
 		 * Defines a handler for action, calling the callback
 		 * (where this is bound to the store for you) when the action is dispatched.
 		 * Use the waitFor callback to wait on other stores before processing
 		 * the action.
 		 */
-		static action(action: Implementation.Action, callback: (payload: any, waitFor: (...stores: Implementation.StoreInterface[]) => void) => void): void;
+		static action(action: Interface.Action, callback: (payload: any, waitFor: (...stores: Interface.StoreInterface[]) => void) => void): void;
 		/**
 		 * Sets up a one-to-one or many-to-one relationship on this store.
 		 * The result is that when getItem is called, at 'key' the result of calling
 		 * entityStore.getItem(item[key]) will be placed. 
 		 */
-		static hasOne(key: string, entityStore: Implementation.StoreInterface): void;
+		static hasOne(key: string, entityStore: Interface.StoreInterface): void;
 		/**
 		 * Sets up a one-to-many or many-to-many relationship on this store.
 		 * The result is that when getItem is called, at 'key' the result of calling
 		 * entityStore.getItems(item[key]) will be placed. 
 		 */
-		static hasMany(key: string, listStore: Implementation.StoreInterface): void;
+		static hasMany(key: string, listStore: Interface.StoreInterface): void;
 
 		/**
 		 * Interface object used to interact with the store.
 		 * A store should never be accessed outside the store,
 		 * through anything but this interface.
 		 */
-		getInterface(): Implementation.StoreInterface;
+		getInterface(): Interface.StoreInterface;
 		
 		initialize(): void;
 		
@@ -124,7 +118,7 @@ declare module 'capacitor' {
 		setRawItem(key: scalar, val: any) : void;
 		setRawItem(key: scalar, val: immutable.Iterable<any, any>) : void;
 		
-		changed: Implementation.EventBroker;
+		changed: Interface.EventBroker;
 	}
 		
 	export class EntityStore extends Store {
@@ -146,7 +140,7 @@ declare module 'capacitor' {
 		getRawItemsWithIds(ids: scalar[]) : immutable.List<immutable.Iterable<any, any>>;
 		getRawItemsWithIds(ids: immutable.List<scalar>) : immutable.List<immutable.Iterable<any, any>>;
 		
-		getInterface(): Implementation.EntityStoreInterface;
+		getInterface(): Interface.EntityStoreInterface;
 	}
 	
 	export class ListStore extends Store {
@@ -166,7 +160,7 @@ declare module 'capacitor' {
 		reset(ids: scalar[]) : void;
 		reset(ids: immutable.List<scalar>) : void;
 		
-		getInterface(): Implementation.ListStoreInterface;
+		getInterface(): Interface.ListStoreInterface;
 	}
 	
 	export class IndexedListStore extends Store {
@@ -192,5 +186,11 @@ declare module 'capacitor' {
 		getItem(index: scalar, id: scalar) : immutable.Iterable<any, any>
 	}
 		
-	export var Dispatcher: Implementation.Dispatcher;
+	export var Dispatcher: Interface.Dispatcher;
+	
+	export class ActionCreator {
+		dispatch(action: Interface.Action, payload: any) : Interface.ActionInstance;
+		createActionInstance(action: Interface.Action, payload : any) : Interface.ActionInstance;
+		generateRequestID() : number;
+	}
 }
